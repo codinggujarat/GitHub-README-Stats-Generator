@@ -80,9 +80,7 @@ function App() {
                 </main>
             </div>
 
-            <footer className="relative z-10 mt-auto py-8 text-xs text-gray-600 font-mono">
-                DESIGNED BY AGENT ANTIGRAVITY
-            </footer>
+
         </div>
     );
 }
