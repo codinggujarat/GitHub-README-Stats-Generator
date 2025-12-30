@@ -80,8 +80,6 @@ function App() {
                                 <StatsPreview
                                     username={activeUser}
                                     theme={theme}
-                                    username={activeUser}
-                                    theme={theme}
                                     showPrivate={showPrivate}
                                     showTrophies={showTrophies}
                                 />
