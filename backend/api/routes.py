@@ -27,21 +27,21 @@ def get_stats_svg(username):
     
     if not data:
          # Return an error SVG or text
-        return Response('<svg><text>User not found</text></svg>', mimetype='image/svg+xml'), 404
+        return Response('<svg><text>User not found</text></svg>', mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'}), 404
         
     svg_content = generate_stats_svg(data['stats'], theme=theme)
     
-    return Response(svg_content, mimetype='image/svg+xml')
+    return Response(svg_content, mimetype='image/svg+xml', headers={'Cache-Control': 'public, max-age=14400'})
 
 @api_bp.route('/languages/<username>/svg', methods=['GET'])
 def get_languages_svg(username):
     theme = request.args.get('theme', 'default')
     data = get_user_data(username)
     if not data:
-        return Response('<svg><text>User not found</text></svg>', mimetype='image/svg+xml'), 404
+        return Response('<svg><text>User not found</text></svg>', mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'}), 404
     
     svg_content = generate_language_svg(data['languages'], theme=theme)
-    return Response(svg_content, mimetype='image/svg+xml')  
+    return Response(svg_content, mimetype='image/svg+xml', headers={'Cache-Control': 'public, max-age=14400'})  
     
 @api_bp.route('/contributions/<username>', methods=['GET'])
 def get_contributions(username):
@@ -57,10 +57,10 @@ def get_streak_svg(username):
     # Streak data comes from contributions
     data = get_contribution_years(username)
     if not data:
-        return Response('<svg><text>User not found</text></svg>', mimetype='image/svg+xml'), 404
+        return Response('<svg><text>User not found</text></svg>', mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'}), 404
     
     svg_content = generate_streak_svg(data, theme=theme)
-    return Response(svg_content, mimetype='image/svg+xml')
+    return Response(svg_content, mimetype='image/svg+xml', headers={'Cache-Control': 'public, max-age=14400'})
 
 @api_bp.route('/trophies/<username>/svg', methods=['GET'])
 def get_trophies_svg(username):
@@ -72,7 +72,7 @@ def get_trophies_svg(username):
     data = get_user_data(username, include_private=include_private)
     
     if not data:
-         return Response("<svg><text x='10' y='20'>User not found</text></svg>", mimetype='image/svg+xml')
+         return Response("<svg><text x='10' y='20'>User not found</text></svg>", mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'})
          
     svg_content = generate_trophies_svg(data['stats'], theme=theme)
-    return Response(svg_content, mimetype='image/svg+xml')
+    return Response(svg_content, mimetype='image/svg+xml', headers={'Cache-Control': 'public, max-age=14400'})
