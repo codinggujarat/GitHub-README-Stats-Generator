@@ -16,49 +16,121 @@ def get_headers():
         "Content-Type": "application/json"
     }
 
-def get_user_data(username):
+def get_user_data(username, include_private=True):
     """
-    Fetches basic user data + repo stats via REST API.
+    Fetches basic user data + repo stats via GraphQL API.
+    Includes total commit contributions.
     """
     headers = get_headers()
-    # 1. Basic User Info
-    user_url = f"{GITHUB_API_URL}/users/{username}"
-    user_resp = requests.get(user_url, headers=headers)
-    
-    if user_resp.status_code != 200:
-        return None, user_resp.status_code
+    if not headers:
+        return None
 
-    user_info = user_resp.json()
-    
-    # 2. Fetch Repos for language stats/stars (Handling pagination might be needed for large users, 
-    # but for MVP we'll grab first 100 which is usually enough for 'top' languages)
-    repos_url = f"{GITHUB_API_URL}/users/{username}/repos?per_page=100&type=owner"
-    repos_resp = requests.get(repos_url, headers=headers)
-    repos = repos_resp.json() if repos_resp.status_code == 200 else []
-
-    stats = {
-        "username": user_info.get("login"),
-        "name": user_info.get("name"),
-        "followers": user_info.get("followers"),
-        "following": user_info.get("following"),
-        "public_repos": user_info.get("public_repos"),
-        "total_stars": sum(repo.get("stargazers_count", 0) for repo in repos),
-        "total_forks": sum(repo.get("forks_count", 0) for repo in repos),
+    query = """
+    query($username: String!) {
+      user(login: $username) {
+        name
+        login
+        followers {
+          totalCount
+        }
+        following {
+          totalCount
+        }
+        repositories(first: 100, ownerAffiliations: [OWNER], orderBy: {field: STARGAZERS, direction: DESC}) {
+          totalCount
+          nodes {
+            name
+            stargazers {
+              totalCount
+            }
+            forks {
+              totalCount
+            }
+            primaryLanguage {
+              name
+            }
+          }
+        }
+        contributionsCollection {
+          totalCommitContributions
+          restrictedContributionsCount
+        }
+        issues {
+          totalCount
+        }
+        pullRequests {
+          totalCount
+        }
+        createdAt
+        organizations {
+          totalCount
+        }
+      }
     }
+    """
     
-    languages = {}
-    for repo in repos:
-        lang = repo.get("language")
-        if lang:
-            languages[lang] = languages.get(lang, 0) + 1
+    try:
+        response = requests.post(
+            GITHUB_GRAPHQL_URL, 
+            json={'query': query, 'variables': {'username': username}}, 
+            headers=headers
+        )
+        
+        if response.status_code != 200:
+            print(f"GraphQL request failed: {response.status_code}")
+            return None
             
-    # Sort languages by usage
-    sorted_languages = dict(sorted(languages.items(), key=lambda item: item[1], reverse=True))
+        data = response.json()
+        if 'errors' in data:
+            print(f"GraphQL errors: {data['errors']}")
+            return None
+            
+        user = data.get('data', {}).get('user')
+        if not user:
+            return None
 
-    return {
-        "stats": stats,
-        "languages": sorted_languages
-    }
+        # Process repos for stats
+        repos = user['repositories']['nodes']
+        total_stars = sum(repo['stargazers']['totalCount'] for repo in repos)
+        total_forks = sum(repo['forks']['totalCount'] for repo in repos)
+        
+        languages = {}
+        for repo in repos:
+            if repo['primaryLanguage']:
+                lang = repo['primaryLanguage']['name']
+                languages[lang] = languages.get(lang, 0) + 1
+                
+        sorted_languages = dict(sorted(languages.items(), key=lambda item: item[1], reverse=True))
+
+        total_commits = user['contributionsCollection']['totalCommitContributions']
+        if not include_private:
+             # If private commits should be hidden, subtract restricted (private) contributions
+             # Note: totalCommitContributions INCLUDES restricted/private commits if the token has access.
+             restricted = user['contributionsCollection']['restrictedContributionsCount']
+             total_commits = total_commits - restricted
+
+        stats = {
+            "username": user['login'],
+            "name": user['name'],
+            "followers": user['followers']['totalCount'],
+            "following": user['following']['totalCount'],
+            "public_repos": user['repositories']['totalCount'], 
+            "total_stars": total_stars,
+            "total_forks": total_forks,
+            "total_commits": total_commits,
+            "total_issues": user['issues']['totalCount'],
+            "total_prs": user['pullRequests']['totalCount'],
+            "created_at": user['createdAt'],
+            "total_orgs": user['organizations']['totalCount']
+        }
+        
+        return {
+            "stats": stats,
+            "languages": sorted_languages
+        }
+    except Exception as e:
+        print(f"Error fetching user data: {e}")
+        return None
 
 def get_contribution_years(username):
     """

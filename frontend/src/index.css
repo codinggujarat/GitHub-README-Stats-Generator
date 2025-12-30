@@ -3,51 +3,35 @@
 @tailwind utilities;
 
 body {
-  @apply bg-brand-dark text-gray-200 antialiased;
+  @apply bg-brand-gray dark:bg-brand-dark text-gray-800 dark:text-gray-200 antialiased transition-colors duration-300;
   font-family: 'Outfit', 'Segoe UI', sans-serif;
   overflow-x: hidden;
 }
 
 /* Aurora Background Animation */
 @keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
 }
 
 .animate-blob {
   animation: blob 7s infinite;
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
 
 /* Glassmorphism Utilities */
 .glass-panel {
-  @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl;
+  @apply bg-white/80 dark:bg-white/5 backdrop-blur-lg border border-white/20 dark:border-white/10 shadow-xl transition-all duration-300;
 }
 
 .glass-input {
-  @apply bg-black/20 backdrop-blur-md border border-white/10 focus:border-brand-accent/50 focus:ring-2 focus:ring-brand-accent/20 transition-all duration-300;
+  @apply bg-white/50 dark:bg-black/20 backdrop-blur-md border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-500 focus:border-brand-accent/50 focus:ring-2 focus:ring-brand-accent/20 transition-all duration-300;
 }
 
 .glass-button {
-  @apply bg-brand-accent/80 hover:bg-brand-accent text-white backdrop-blur-sm shadow-lg shadow-brand-accent/20 transition-all duration-300 hover:scale-105 active:scale-95;
+  @apply bg-brand-accent hover:bg-brand-accent/90 text-white backdrop-blur-sm shadow-lg shadow-brand-accent/20 transition-all duration-300 hover:scale-105 active:scale-95;
 }

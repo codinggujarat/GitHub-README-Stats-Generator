@@ -4,11 +4,13 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        'brand-dark': '#0d1117',
-        'brand-light': '#ffffff',
+        'brand-dark': '#000000', // Pure Black
+        'brand-light': '#ffffff', // Pure White
+        'brand-gray': '#f5f5f7',  // Modern Light Gray
         'brand-accent': '#58a6ff',
       },
     },

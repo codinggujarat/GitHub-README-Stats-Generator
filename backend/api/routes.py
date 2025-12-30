@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, Response, current_app
 from services.github_service import get_user_data, get_contribution_years
-from services.svg_generator import generate_stats_svg, generate_language_svg, generate_streak_svg
+from services.svg_generator import generate_stats_svg, generate_language_svg, generate_streak_svg, generate_trophies_svg
+from services.github_service import get_user_data, get_contribution_years
 
 api_bp = Blueprint('api', __name__)
 
@@ -9,7 +10,8 @@ def get_stats(username):
     """
     Returns JSON stats for debugging or custom frontend rendering.
     """
-    data = get_user_data(username)
+    include_private = request.args.get('include_private', 'false').lower() == 'true'
+    data = get_user_data(username, include_private=include_private)
     if not data:
         return jsonify({"error": "User not found or API limits reached"}), 404
     return jsonify(data)
@@ -20,7 +22,8 @@ def get_stats_svg(username):
     Returns an SVG image of the stats card.
     """
     theme = request.args.get('theme', 'default')
-    data = get_user_data(username)
+    include_private = request.args.get('include_private', 'false').lower() == 'true'
+    data = get_user_data(username, include_private=include_private)
     
     if not data:
          # Return an error SVG or text
@@ -57,4 +60,19 @@ def get_streak_svg(username):
         return Response('<svg><text>User not found</text></svg>', mimetype='image/svg+xml'), 404
     
     svg_content = generate_streak_svg(data, theme=theme)
+    return Response(svg_content, mimetype='image/svg+xml')
+
+@api_bp.route('/trophies/<username>/svg', methods=['GET'])
+def get_trophies_svg(username):
+    """
+    Returns an SVG image of the trophies.
+    """
+    theme = request.args.get('theme', 'default')
+    include_private = request.args.get('include_private', 'false').lower() == 'true'
+    data = get_user_data(username, include_private=include_private)
+    
+    if not data:
+         return Response("<svg><text x='10' y='20'>User not found</text></svg>", mimetype='image/svg+xml')
+         
+    svg_content = generate_trophies_svg(data['stats'], theme=theme)
     return Response(svg_content, mimetype='image/svg+xml')

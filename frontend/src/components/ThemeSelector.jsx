@@ -6,6 +6,16 @@ export const themes = [
     { id: 'neon', name: 'Neon', color: '#00ffff' },
     { id: 'glass', name: 'Glass', color: '#888888' },
     { id: 'cyberpunk', name: 'Cyber', color: '#fcee0a' },
+    { id: 'dracula', name: 'Dracula', color: '#bd93f9' },
+    { id: 'monokai', name: 'Monokai', color: '#a6e22e' },
+    { id: 'nord', name: 'Nord', color: '#88c0d0' },
+    { id: 'solarized_light', name: 'Solarized Light', color: '#fdf6e3' },
+    { id: 'solarized_dark', name: 'Solarized Dark', color: '#002b36' },
+    { id: 'cobalt', name: 'Cobalt', color: '#002240' },
+    { id: 'synthwave', name: 'Synthwave', color: '#ff71ce' },
+    { id: 'high_contrast', name: 'High Contrast', color: '#000000' },
+    { id: 'gruvbox', name: 'Gruvbox', color: '#fe8019' },
+    { id: 'tokyonight', name: 'Tokyo Night', color: '#7aa2f7' },
 ];
 
 export default function ThemeSelector({ currentTheme, setTheme }) {
@@ -24,8 +34,8 @@ export default function ThemeSelector({ currentTheme, setTheme }) {
                         className={`
               relative p-3 rounded-xl text-xs font-semibold text-left transition-all duration-300
               ${currentTheme === theme.id
-                                ? 'bg-brand-accent text-white shadow-lg shadow-brand-accent/25 scale-[1.02] ring-2 ring-brand-accent/50 ring-offset-2 ring-offset-[#0d1117]'
-                                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-gray-200'}
+                                ? 'bg-brand-accent text-white shadow-lg shadow-brand-accent/25 scale-[1.02] ring-2 ring-brand-accent/50 ring-offset-2 ring-offset-gray-100 dark:ring-offset-[#0d1117]'
+                                : 'bg-black/5 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-black/10 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-gray-200'}
             `}
                     >
                         <div className="flex items-center gap-2">
