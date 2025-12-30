@@ -36,7 +36,7 @@ def get_user_data(username, include_private=True):
         following {
           totalCount
         }
-        repositories(first: 100, ownerAffiliations: [OWNER], orderBy: {field: STARGAZERS, direction: DESC}) {
+        repositories(first: 50, ownerAffiliations: [OWNER], orderBy: {field: STARGAZERS, direction: DESC}) {
           totalCount
           nodes {
             name
@@ -73,7 +73,8 @@ def get_user_data(username, include_private=True):
         response = requests.post(
             GITHUB_GRAPHQL_URL, 
             json={'query': query, 'variables': {'username': username}}, 
-            headers=headers
+            headers=headers,
+            timeout=10
         )
         
         if response.status_code != 200:
