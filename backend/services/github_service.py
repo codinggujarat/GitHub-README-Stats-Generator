@@ -78,16 +78,16 @@ def get_user_data(username, include_private=True):
         
         if response.status_code != 200:
             print(f"GraphQL request failed: {response.status_code}")
-            return None
+            return {"error": f"GitHub API Status: {response.status_code}"}
             
         data = response.json()
         if 'errors' in data:
             print(f"GraphQL errors: {data['errors']}")
-            return None
+            return {"error": f"GraphQL Error: {data['errors'][0]['message']}"}
             
         user = data.get('data', {}).get('user')
         if not user:
-            return None
+            return {"error": "User not found in data"}
 
         # Process repos for stats
         repos = user['repositories']['nodes']
@@ -130,7 +130,7 @@ def get_user_data(username, include_private=True):
         }
     except Exception as e:
         print(f"Error fetching user data: {e}")
-        return None
+        return {"error": f"Exception: {str(e)}"}
 
 def get_contribution_years(username):
     """

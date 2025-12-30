@@ -25,9 +25,9 @@ def get_stats_svg(username):
     include_private = request.args.get('include_private', 'false').lower() == 'true'
     data = get_user_data(username, include_private=include_private)
     
-    if not data:
-         # Return an error SVG or text
-        return Response('<svg><text>User not found</text></svg>', mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'}), 404
+    if not data or 'error' in data:
+        err_msg = data['error'] if data and 'error' in data else 'User not found'
+        return Response(f'<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100"><rect width="100%" height="100%" fill="#0d1117"/><text x="10" y="20" fill="red" font-family="monospace">Error: {err_msg}</text></svg>', mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'}), 200
         
     svg_content = generate_stats_svg(data['stats'], theme=theme)
     
@@ -37,8 +37,9 @@ def get_stats_svg(username):
 def get_languages_svg(username):
     theme = request.args.get('theme', 'default')
     data = get_user_data(username)
-    if not data:
-        return Response('<svg><text>User not found</text></svg>', mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'}), 404
+    if not data or 'error' in data:
+        err_msg = data['error'] if data and 'error' in data else 'User not found'
+        return Response(f'<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100"><rect width="100%" height="100%" fill="#0d1117"/><text x="10" y="20" fill="red" font-family="monospace">Error: {err_msg}</text></svg>', mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'}), 200
     
     svg_content = generate_language_svg(data['languages'], theme=theme)
     return Response(svg_content, mimetype='image/svg+xml', headers={'Cache-Control': 'public, max-age=14400'})  
@@ -71,8 +72,9 @@ def get_trophies_svg(username):
     include_private = request.args.get('include_private', 'false').lower() == 'true'
     data = get_user_data(username, include_private=include_private)
     
-    if not data:
-         return Response("<svg><text x='10' y='20'>User not found</text></svg>", mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'})
+    if not data or 'error' in data:
+         err_msg = data['error'] if data and 'error' in data else 'User not found'
+         return Response(f"<svg xmlns='http://www.w3.org/2000/svg' width='400' height='100'><rect width='100%' height='100%' fill='#0d1117'/><text x='10' y='20' fill='red' font-family='monospace'>Error: {err_msg}</text></svg>", mimetype='image/svg+xml', headers={'Cache-Control': 'no-cache'}), 200
          
     svg_content = generate_trophies_svg(data['stats'], theme=theme)
     return Response(svg_content, mimetype='image/svg+xml', headers={'Cache-Control': 'public, max-age=14400'})
