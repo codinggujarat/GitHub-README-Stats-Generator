@@ -107,7 +107,7 @@ def get_user_data(username, include_private=True):
              # If private commits should be hidden, subtract restricted (private) contributions
              # Note: totalCommitContributions INCLUDES restricted/private commits if the token has access.
              restricted = user['contributionsCollection']['restrictedContributionsCount']
-             total_commits = total_commits - restricted
+             total_commits = max(0, total_commits - restricted)
 
         stats = {
             "username": user['login'],
